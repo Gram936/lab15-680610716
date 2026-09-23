@@ -1,4 +1,5 @@
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -9,15 +10,57 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-export function RegisterDialog() {
+import { UserRoundPlus } from "lucide-react";
+import { currentStudent } from "@/lib/mock-data";
+import type { Course } from "@/lib/types";
+
+type RegisterDialogProps = {
+  availableCourses: Course[];
+  onConfirm?: (courseId: string,selectTime:string) => void;
+};
+
+export function RegisterDialog({ availableCourses, onConfirm }: RegisterDialogProps) {
+
+  const getCurrentTime = () => {
+    const now = new Date();
+    const hours = String(now.getHours()).padStart(2, "0");
+    const minutes = String(now.getMinutes()).padStart(2, "0");
+    return `${hours}:${minutes}`;
+  };
+ const [time, setTime] = useState(getCurrentTime);
+  const [fullName, setFullName] = useState(
+    `${currentStudent.firstName} ${currentStudent.lastName}`
+  );
+  const [program, setProgram] = useState(currentStudent.program);
+
   const [open, setOpen] = useState(false); // true = แสดง Dialog
   const [courseId, setCourseId] = useState("");
 
+  useEffect(() => {
+    setFullName(`${currentStudent.firstName} ${currentStudent.lastName}`);
+    setProgram(currentStudent.program);
+  }, []);
+
   function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
     e.preventDefault(); // ไม่ให้หน้าเว็บ reload
+    if (!courseId) {
+      setOpen(false);
+      return;
+    }
+
+    onConfirm?.(courseId,time);
     setCourseId(""); // เคลียร์ฟอร์ม
     setOpen(false); // ปิด Dialog
   }
@@ -26,7 +69,10 @@ export function RegisterDialog() {
     <Dialog open={open} onOpenChange={setOpen}>
       {/* ปุ่มที่กดแล้วเปิด Dialog */}
       <DialogTrigger>
-        <Button>ลงทะเบียน</Button>
+        <Button disabled={availableCourses.length === 0}>
+          <UserRoundPlus size={5} />
+          ลงทะเบียน
+        </Button>
       </DialogTrigger>
 
       {/* ฟอร์มที่แสดงออกมาเมื่อกดปุ่ม */}
@@ -38,22 +84,44 @@ export function RegisterDialog() {
           </DialogHeader>
 
           <div className="space-y-2">
-            <Label htmlFor="studentId">รหัสนักศึกษา</Label>
-            <Input id="studentId" placeholder="เช่น 650610002" />
+            <Label htmlFor="course">วิชา</Label>
+            <Select value={courseId} onValueChange={setCourseId}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="เลือกวิชา" />
+              </SelectTrigger>
+              <SelectContent>
+                {availableCourses.map((course) => (
+                  <SelectItem key={course.courseId} value={course.courseId}>
+                    {course.courseId} - {course.courseTitle}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="fullName">ชื่อ-นามสกุล</Label>
-            <Input id="fullName" placeholder="เช่น Cillian Murphy" />
+            <Label htmlFor="time">เวลา</Label>
+            <Input
+              id="time"
+              type="time"
+              value={time}
+              onChange={(e) => setTime(e.target.value)}
+            />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="courseId">รหัสวิชา</Label>
-            <Input id="courseId" placeholder="เช่น 261207" />
+            <Label htmlFor="fullName">ชื่อ นศ.</Label>
+            <Input id="fullName" value={fullName} readOnly />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="program">โปรแกรม</Label>
+            <Input id="program" value={program} readOnly />
           </div>
 
           <DialogFooter>
-            <Button type="submit">ยืนยัน</Button>
+            <Button
+              type="submit"disabled={!courseId}> ยืนยันการลงทะเบียน</Button>
           </DialogFooter>
         </form>
       </DialogContent>
