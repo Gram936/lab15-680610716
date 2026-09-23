@@ -29,7 +29,7 @@ export const students: Student[] = [
     courses: ["269101", "261497"],
   },
   {
-    studentId: "680610708",
+    studentId: "680610716",
     firstName: "Winatthapon",
     lastName: "Jansuk",
     program: "CPE",
