@@ -30,7 +30,7 @@ export function CourseCard({ course, student, enrolledAt, isEnrolled = false, on
           </Badge>
         </div>
         <CardDescription>
-          รหัสวิชา: {course.courseId} · ผู้สอน: {course.instructors.join(", ")}
+          รหัสวิชา: {course.courseId} · ผู้สอน: {course.instructors.join(",")}
         </CardDescription>
       </CardHeader>
       <CardContent className="flex items-end justify-between">
