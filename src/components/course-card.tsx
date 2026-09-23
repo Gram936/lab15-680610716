@@ -19,7 +19,7 @@ export function CourseCard({ course, student, enrolledAt }: CourseCardProps) {
       <CardHeader>
         <CardTitle className="text-base">{course.courseTitle}</CardTitle>
         <CardDescription>
-          รหัสวิชา: {course.courseId} · ผู้สอน: {course.instructors.join(", ")}
+          รหัสวิชา: {course.courseId} · ผู้สอน: {course.instructors.join(",")}
         </CardDescription>
       </CardHeader>
       <CardContent className="flex items-end justify-between">
